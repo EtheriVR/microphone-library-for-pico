@@ -1,53 +1,28 @@
 # ######################
 # FORK CHANGES
 
-An example for using analogue microphone over USB is added.
+An example for using analogue microphone over USB is the focus its set to 384khz for bat detection and should work with Android devices over OTG.
 
-So far only 16khz works.
-
-It is important to use some kind of active microphone, as just connecting to a simple microphone will not work.
-
-There is a lot of noise, probably due to USB connection.
-
-This is just a proof of concept, and possibly a basis for further research and experimenting.
 
 
 # #######################
 
 # Microphone Library for Pico
 
-Capture audio from a microphone on your [Raspberry Pi Pico](https://www.raspberrypi.org/products/raspberry-pi-pico/) or any [RP2040](https://www.raspberrypi.org/products/rp2040/) based board. 🎤
-
-
 ## Hardware
 
- * RP2040 board
-   * [Raspberry Pi Pico](https://www.raspberrypi.org/products/raspberry-pi-pico/)
- * Microphones
-   * Analog
-     * [Electret Microphone Amplifier - MAX9814 with Auto Gain Control](https://www.adafruit.com/product/1713) 
-   * PDM
-     * [Adafruit PDM MEMS Microphone Breakout](https://www.adafruit.com/product/3492)
+ * RP2350 board
+   * Probably still works with the Pico 1 RP2040 too but not tested
 
 ### Default Pinout
 
 #### Analog Microphone
 
-| Raspberry Pi Pico / RP2040 | Analog Microphone |
+| Raspberry Pi Pico / RP2350 | Analog Microphone |
 | -------------------------- | ----------------- |
 | 3.3V | VCC |
 | GND | GND |
 | GPIO 26 | OUT |
-
-#### PDM Microphone
-
-| Raspberry Pi Pico / RP2040 | PDM Microphone |
-| -------------------------- | ----------------- |
-| 3.3V | VCC |
-| GND | GND |
-| GND | SEL |
-| GPIO 2 | DAT |
-| GPIO 3 | CLK |
 
 GPIO pins are configurable in examples or API.
 

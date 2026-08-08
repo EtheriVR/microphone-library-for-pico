@@ -1,3 +1,19 @@
+# == DO NOT EDIT THE FOLLOWING LINES for the Raspberry Pi Pico VS Code Extension to work ==
+if(WIN32)
+    set(USERHOME $ENV{USERPROFILE})
+else()
+    set(USERHOME $ENV{HOME})
+endif()
+set(sdkVersion 2.1.0)
+set(toolchainVersion RISCV_ZCB_RPI_2_3_0_0)
+set(picotoolVersion 2.1.0)
+set(picoVscode ${USERHOME}/.pico-sdk/cmake/pico-vscode.cmake)
+if (EXISTS ${picoVscode})
+    include(${picoVscode})
+endif()
+# ====================================================================================
+set(PICO_BOARD pico2 CACHE STRING "Board type")
+
 cmake_minimum_required(VERSION 3.12)
 
 # initialize pico_sdk from GIT
@@ -41,7 +57,4 @@ target_include_directories(pico_analog_microphone INTERFACE
 
 target_link_libraries(pico_analog_microphone INTERFACE pico_stdlib hardware_adc hardware_dma)
 
-add_subdirectory("examples/hello_analog_microphone")
-add_subdirectory("examples/hello_pdm_microphone")
-add_subdirectory("examples/usb_microphone")
 add_subdirectory("examples/usb_analog_microphone")

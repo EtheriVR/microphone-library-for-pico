@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  * 
  * This examples creates a USB Microphone device using the TinyUSB
- * library and captures data from an ANALOG microphone using a sample
- * rate of 16 kHz, to be sent the to PC.
+ * library and captures data from an ANALOG microphone at 384 kHz, to
+ * be sent the to PC.
  * 
  * The USB microphone code is based on the TinyUSB audio_test example.
  * 
@@ -29,8 +29,9 @@ const struct analog_microphone_config config = {
     //.bias_voltage = 1.25,
     .bias_voltage = 0,
 
-    // sample rate in Hz
-    .sample_rate = 16000,
+    // sample rate in Hz (derived from the USB EP size in tusb_config.h,
+    // so the ADC and the USB descriptor can't drift out of sync)
+    .sample_rate = SAMPLE_RATE,
 
     // number of samples to buffer
     .sample_buffer_size = SAMPLE_BUFFER_SIZE,
@@ -51,11 +52,15 @@ void on_analog_samples_ready()
 
 void on_usb_microphone_tx_ready()
 {
-  // Callback from TinyUSB library when all data is ready
-  // to be transmitted.
-  //
-  // Write local buffer to the USB microphone
-  usb_microphone_write(sample_buffer, sizeof(sample_buffer));
+  // Only send data if the ADC has actually read something new
+  if (samples_read > 0) {
+    // Write ONLY the bytes that were populated, not the whole buffer size
+    // Note: samples_read is the number of uint16_t, so multiply by 2 for bytes
+    usb_microphone_write(sample_buffer, samples_read * sizeof(uint16_t));
+    
+    // Reset samples_read to 0 so we don't blast the same old data on the next 1ms tick
+    samples_read = 0; 
+  }
 }
 
 
@@ -86,3 +91,4 @@ int main(void)
 
   return 0;
 }
+
