@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  * 
  * This examples creates a USB Microphone device using the TinyUSB
- * library and captures data from an ANALOG microphone using a sample
- * rate of 16 kHz, to be sent the to PC.
+ * library and captures data from an ANALOG microphone at 384 kHz, to
+ * be sent the to PC.
  * 
  * The USB microphone code is based on the TinyUSB audio_test example.
  * 
@@ -20,70 +20,6 @@
 #include "pico/analog_microphone.h"
 #include "tusb.h"
 
-static uint32_t current_sample_rate = 48000;
-/*
-//--------------------------------------------------------------------+
-// AUDIO GET REQUEST CALLBACK
-// Invoked when host requests data from an audio entity
-//--------------------------------------------------------------------+
-bool tud_audio_get_req_entity_cb(uint8_t rhport, tusb_control_request_t const * p_request)
-{
-    audio_control_request_t const * request = (audio_control_request_t const *) p_request;
-
-    // Handle Clock Control requests
-    if (request->bControlSelector == AUDIO_CS_CTRL_SAM_FREQ)
-    {
-        if (request->bRequest == AUDIO_CS_REQ_CUR)
-        {
-            // Host is asking for the CURRENT sample rate
-            audio_control_cur_4_t curf = { (int32_t) current_sample_rate };
-            return tud_audio_buffer_and_schedule_control_xfer(rhport, p_request, &curf, sizeof(curf));
-        }
-        else if (request->bRequest == AUDIO_CS_REQ_RANGE)
-        {
-            // Host is asking for the SUPPORTED sample rate range
-            // We tell it we only support 48000 Hz (Min: 48000, Max: 48000, Res: 0)
-            audio_control_range_4_n_t(1) rangef = {
-                .wNumSubRanges = 1,
-                .subrange[0] = { 48000, 48000, 0 } 
-            };
-            return tud_audio_buffer_and_schedule_control_xfer(rhport, p_request, &rangef, sizeof(rangef));
-        }
-    }
-    else if (request->bControlSelector == AUDIO_CS_CTRL_CLK_VALID && request->bRequest == AUDIO_CS_REQ_CUR)
-    {
-        // Host is asking if the clock is valid (Android strictly requires this)
-        audio_control_cur_1_t cur_valid = { .bCur = 1 };
-        return tud_audio_buffer_and_schedule_control_xfer(rhport, p_request, &cur_valid, sizeof(cur_valid));
-    }
-
-    // Return false for unhandled requests to let TinyUSB STALL the endpoint
-    // This tells the host we don't support the specific feature it asked for
-    return false;
-}
-
-//--------------------------------------------------------------------+
-// AUDIO SET REQUEST CALLBACK
-// Invoked when host sends data to change an audio entity's state
-//--------------------------------------------------------------------+
-bool tud_audio_set_req_entity_cb(uint8_t rhport, tusb_control_request_t const * p_request, uint8_t *buf)
-{
-    audio_control_request_t const * request = (audio_control_request_t const *) p_request;
-
-    // Handle host instructing us to CHANGE the sample rate
-    if (request->bControlSelector == AUDIO_CS_CTRL_SAM_FREQ && request->bRequest == AUDIO_CS_REQ_CUR)
-    {
-        // Extract the new sample rate from the buffer provided by the host
-        audio_control_cur_4_t const * curf = (audio_control_cur_4_t const *) buf;
-        current_sample_rate = (uint32_t) curf->bCur;
-        
-        // Return true to acknowledge we accepted the new sample rate
-        return true;
-    }
-
-    return false;
-}
-*/
 // configuration
 const struct analog_microphone_config config = {
     // GPIO to use for input, must be ADC compatible (GPIO 26 - 28)
@@ -93,8 +29,9 @@ const struct analog_microphone_config config = {
     //.bias_voltage = 1.25,
     .bias_voltage = 0,
 
-    // sample rate in Hz
-    .sample_rate = 48000,
+    // sample rate in Hz (derived from the USB EP size in tusb_config.h,
+    // so the ADC and the USB descriptor can't drift out of sync)
+    .sample_rate = SAMPLE_RATE,
 
     // number of samples to buffer
     .sample_buffer_size = SAMPLE_BUFFER_SIZE,
