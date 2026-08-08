@@ -39,6 +39,8 @@ git clone https://github.com/ArmDeveloperEcosystem/microphone-library-for-pico.g
 
 ## Building
 
+cmake is untested, but you can build this project by simply installing the vscode plugin and setting the pico SDK to 2.1.0, maybe it works with later versions but this worked for the 384khz android connector.
+
 1. [Set up the Pico C/C++ SDK](https://datasheets.raspberrypi.org/pico/getting-started-with-pico.pdf)
 2. Set `PICO_SDK_PATH`
 ```sh
